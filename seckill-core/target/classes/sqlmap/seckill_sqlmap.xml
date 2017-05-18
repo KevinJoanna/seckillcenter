@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="seckill">
+
+    <typeAlias alias="seckillDO" type="com.mockuai.seckillcenter.core.domain.SeckillDO"/>
+    <typeAlias alias="seckillQTO" type="com.mockuai.seckillcenter.common.domain.qto.SeckillQTO"/>
+
+    <resultMap id="result" class="seckillDO">
+        <result column="id" property="id" jdbcType="BIGINT"/>
+        <result column="biz_code" property="bizCode" jdbcType="VARCHAR"/>
+        <result column="seller_id" property="sellerId" jdbcType="BIGINT"/>
+        <result column="item_seller_id" property="itemSellerId" jdbcType="BIGINT"/>
+        <result column="item_id" property="itemId" jdbcType="BIGINT"/>
+        <result column="sku_id" property="skuId" jdbcType="BIGINT"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="item_invalid_time" property="itemInvalidTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="delete_mark" property="deleteMark" jdbcType="TINYINT"/>
+        <result column="gmt_created" property="gmtCreated" jdbcType="TIMESTAMP"/>
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="columnList">
+    id,
+    biz_code,
+    seller_id,
+    item_seller_id,
+    item_id,
+    sku_id,
+    content,
+    start_time,
+    end_time,
+    item_invalid_time,
+    status,
+    delete_mark,
+    gmt_created,
+    gmt_modified
+    </sql>
+
+    <sql id="queryWhere">
+        where delete_mark=0
+        <isNotNull prepend="AND" property="id">
+            id = #id#
+        </isNotNull>
+        <isNotNull prepend="AND" property="bizCode">
+            biz_code = #bizCode#
+        </isNotNull>
+        <isNotNull prepend="AND" property="status">
+            status = #status#
+        </isNotNull>
+        <isNotNull prepend="AND" property="skuId">
+            sku_id = #skuId#
+        </isNotNull>
+        <isNotNull prepend="AND" property="startTimeLt">
+            <![CDATA[( #startTimeLt# < start_time AND item_invalid_time IS NULL)]]>
+        </isNotNull>
+        <isNotNull prepend="AND" property="startTimeGe">
+            <![CDATA[( #startTimeGe# >= start_time AND item_invalid_time IS NULL)]]>
+        </isNotNull>
+        <isNotNull prepend="AND" property="endTimeLe">
+            <![CDATA[ #endTimeLe# <= end_time ]]>
+        </isNotNull>
+        <isNotNull prepend="AND" property="endTimeGt">
+            <![CDATA[( #endTimeGt# > end_time OR item_invalid_time IS NOT NULL)]]>
+        </isNotNull>
+        <isNotNull property="skuIds" prepend="AND">
+            sku_id in (
+            <iterate property="skuIds" conjunction=",">
+                #skuIds[]#
+            </iterate>
+            )
+        </isNotNull>
+        <isNotNull prepend="AND" property="itemId">
+            item_id = #itemId#
+        </isNotNull>
+        <isNotNull property="itemIds" prepend="AND">
+            item_id in (
+            <iterate property="itemIds" conjunction=",">
+                #itemIds[]#
+            </iterate>
+            )
+        </isNotNull>
+    </sql>
+
+    <insert id="addSeckill" parameterClass="seckillDO">
+        insert into seckill( biz_code, seller_id,item_seller_id, item_id, sku_id, content, start_time, end_time, status, delete_mark,
+        gmt_created, gmt_modified ) values( #bizCode#, #sellerId#,#itemSellerId#, #itemId#, #skuId#, #content#, #startTime#, #endTime#,
+        #status#, 0, now(), now() )
+        <selectKey resultClass="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updateSeckill" parameterClass="seckillDO">
+        UPDATE seckill SET gmt_modified=now()
+        <isNotNull prepend="," property="status">
+            status = #status#
+        </isNotNull>
+        <isNotNull prepend="," property="itemInvalidTime">
+            item_invalid_time = #itemInvalidTime#
+        </isNotNull>
+        WHERE id = #id# AND biz_code = #bizCode#
+    </update>
+
+    <select id="getSeckill" resultMap="result" parameterClass="seckillDO">
+        select
+        <include refid="seckill.columnList"/>
+        from seckill WHERE delete_mark=0
+        <isNotNull prepend="AND" property="id">
+            id = #id#
+        </isNotNull>
+        <isNotNull prepend="AND" property="bizCode">
+            biz_code = #bizCode#
+        </isNotNull>
+        <isNotNull prepend="AND" property="status">
+            status = #status#
+        </isNotNull>
+        <isNotNull prepend="AND" property="skuId">
+            sku_id = #skuId#
+        </isNotNull>
+    </select>
+
+    <select id="querySeckill" parameterClass="SeckillQTO" resultMap="result">
+        select
+        <include refid="seckill.columnList"/>
+        from seckill
+        <include refid="seckill.queryWhere"/>
+        ORDER BY id desc
+        <isNotNull property="count">
+            <![CDATA[limit #offset#,#count#]]>
+        </isNotNull>
+    </select>
+
+    <select id="countOfQuerySeckill" parameterClass="SeckillQTO" resultClass="java.lang.Integer">
+        select count(1) from seckill
+        <include refid="seckill.queryWhere"/>
+    </select>
+
+</sqlMap>

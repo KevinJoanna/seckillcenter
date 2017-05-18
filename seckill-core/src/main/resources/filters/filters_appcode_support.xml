@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActionConfig>
+	<extends value="true" />
+	<filters>
+		<chain name="required">
+			<filter name="xxx" implClass="xxx" />
+		</chain>
+		
+		<chain name="addOrder">
+			<command name="filterA" implClass="xxx"/>
+			<command name="filterB" implClass="xxx" />
+		</chain>
+	</filters>
+</ActionConfig>

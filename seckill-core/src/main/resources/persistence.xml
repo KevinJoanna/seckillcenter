@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+     	http://www.springframework.org/schema/context
+     	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+     	http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-2.5.xsd"
+       default-autowire="byName">
+
+    <!--<context:property-placeholder location="classpath:jdbc.properties"/>-->
+
+    <bean id="parentDataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+        <property name="simultaneousBuildThrottle" value="${jdbc.simultaneousBuildThrottle}"/>
+        <property name="prototypeCount" value="${jdbc.prototypeCount}"/>
+        <property name="minimumConnectionCount" value="${jdbc.minimumConnectionCount}"/>
+        <property name="maximumConnectionCount" value="${jdbc.maximumConnectionCount}"/>
+        <property name="maximumActiveTime" value="${jdbc.maximumActiveTime}"/>
+        <property name="testBeforeUse" value="true"/>
+        <property name="houseKeepingTestSql" value="select sysdate() from dual"/>
+    </bean>
+
+    <bean id="dbaasDataSource" parent="parentDataSource">
+        <property name="driver" value="${jdbc.driverClass}"/>
+        <property name="driverUrl" value="${dbaas.jdbcUrl}"/>
+        <property name="user" value="${dbaas.user}"/>
+        <property name="password" value="${dbaas.password}"/>
+    </bean>
+
+    <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+        <property name="dataSource" ref="dbaasDataSource"/>
+        <property name="configLocation" value="classpath:sqlmap-config.xml"/>
+    </bean>
+
+    <!-- <bean id="drdsDataSource" parent="parentDataSource"> <property name="alias"
+        value="drdsDataSource" /> <property name="driverUrl" value="${drds.jdbcUrl}"
+        /> <property name="user" value="${drds.user}" /> <property name="password"
+        value="${drds.password}" /> </bean> -->
+
+    <util:map id="dataSources">
+        <entry key="dbaas" value-ref="dbaasDataSource"/>
+        <!--  <entry key="drds" value-ref="drdsDataSource" />  -->
+    </util:map>
+
+    <bean id="dataSourceLookup"
+          class="org.springframework.jdbc.datasource.lookup.MapDataSourceLookup">
+        <constructor-arg>
+            <ref bean="dataSources"/>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dbaasDataSource"/>
+    </bean>
+
+    <!-- 事务模板 -->
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager">
+            <ref local="transactionManager"/>
+        </property>
+    </bean>
+
+
+    <!-- <bean id="dataSource" class="com.aliyun.rds.rdscenter.datasource.MultiDataSource">
+        <property name="targetDataSources" ref="dataSources" /> <property name="defaultTargetDataSource"
+        ref="dbaasDataSource" /> <property name="dataSourceLookup" ref="dataSourceLookup"
+        /> </bean> -->
+
+
+    <!-- 事务模板 -->    <!-- <bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+	</bean> -->
+</beans>

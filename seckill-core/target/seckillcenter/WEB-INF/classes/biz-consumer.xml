@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       				http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    <bean name="itemSkuClient" class="com.mockuai.itemcenter.client.impl.ItemSkuClientImpl"></bean>
+    <bean name="itemClient" class="com.mockuai.itemcenter.client.impl.ItemClientImpl"></bean>
+    <bean name="preOrderClient" class="com.mockuai.tradecenter.client.impl.PreOrderClientImpl"></bean>
+    <bean name="appClient" class="com.mockuai.appcenter.client.impl.AppClientImpl"></bean>
+    <bean name="tradeDataReportClient" class="com.mockuai.tradecenter.client.impl.TradeDataReportClientImpl"></bean>
+    <bean name="orderClient" class="com.mockuai.tradecenter.client.impl.OrderClientImpl"></bean>
+    <bean name="itemEfficientClient" class="com.mockuai.itemcenter.client.impl.ItemEfficientClientImpl"/>
+</beans>

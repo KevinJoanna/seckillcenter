@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActionConfig>
+    <filters>
+        <chain name="required">
+            <filter name="appCheckFilter" implClass="com.mockuai.seckillcenter.core.filter.impl.AppCheckFilter"/>
+        </chain>
+    </filters>
+</ActionConfig>

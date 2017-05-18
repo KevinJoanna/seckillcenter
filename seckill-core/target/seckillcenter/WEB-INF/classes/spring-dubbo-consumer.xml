@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://code.alibabatech.com/schema/dubbo  
+    http://code.alibabatech.com/schema/dubbo/dubbo.xsd ">
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="seckill_consumer"/>
+    <!-- 使用multicast广播注册中心暴露服务地址--><!-- <dubbo:registry address="multicast://localhost:1234" /> --><!-- 使用zookeeper注册中心暴露服务地址 -->
+    <dubbo:registry address="zookeeper://dev.zk.mockuai.com:2181"/>
+
+    <!-- 声明需要暴露的服务接口 --><!-- <dubbo:service interface="com.mockuaickuai.deliverycenter.client.ExpressClient" ref="expressClient" protocol="dubbo"/>
+    <dubbo:service interface="com.mockuaickuai.deliverycenter.client.FeeClient" ref="feeClient" protocol="dubbo"/>
+    <dubbo:service interface="com.mockuaickuai.deliverycenter.client.StorageClient" ref="storageClient" protocol="dubbo"/>
+   -->
+
+    <dubbo:reference id="itemService" interface="com.mockuai.itemcenter.common.api.ItemService" check="false"/>
+    <dubbo:reference id="appService" interface="com.mockuai.appcenter.common.api.AppService" check="false"/>
+    <dubbo:reference id="tradeService" interface="com.mockuai.tradecenter.common.api.TradeService" check="false"/>
+
+</beans>

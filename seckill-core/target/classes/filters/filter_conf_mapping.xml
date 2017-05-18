@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MappingConfig>
+    <mapping appCode="default" filterConfPath="filters_default_support.xml"/>
+</MappingConfig>
+
